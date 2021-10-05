@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Events
 import Coordinate exposing (Coordinate, Distance(..))
 import Element
     exposing
@@ -17,6 +18,7 @@ import Element
         , layout
         , layoutWith
         , none
+        , paragraph
         , px
         , rgb255
         , row
@@ -30,6 +32,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Grid exposing (Grid)
 import Html exposing (Html)
+import Json.Decode as D exposing (Decoder)
 import List.Extra as List
 import Random exposing (generate)
 import Tile exposing (Tile)
@@ -109,7 +112,18 @@ view model =
                         , el [ alignRight ] <| scale
                         ]
                     , gridView grid state
-                    , Input.button [ alignRight ] { onPress = Just Restart, label = text "Recommencer" }
+                    , Input.button [ alignRight ]
+                        { onPress = Just Restart
+                        , label =
+                            paragraph []
+                                [ el
+                                    [ Border.widthEach { top = 0, left = 0, right = 0, bottom = 2 }
+                                    ]
+                                  <|
+                                    text "R"
+                                , el [] <| text "ecommencer"
+                                ]
+                        }
                     ]
 
 
@@ -190,5 +204,22 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = \_ -> Browser.Events.onKeyPress rKeyDecoder
         }
+
+
+rKeyDecoder : Decoder Msg
+rKeyDecoder =
+    D.field "key" D.string
+        |> D.andThen
+            (\string ->
+                case String.uncons string of
+                    Just ( 'r', "" ) ->
+                        D.succeed Restart
+
+                    Just ( 'R', "" ) ->
+                        D.succeed Restart
+
+                    _ ->
+                        D.fail "key not supported"
+            )

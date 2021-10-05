@@ -115,12 +115,12 @@ view model =
                     , Input.button [ alignRight ]
                         { onPress = Just Restart
                         , label =
+                            let
+                                borderBottom =
+                                    Border.widthEach { top = 0, left = 0, right = 0, bottom = 2 }
+                            in
                             paragraph []
-                                [ el
-                                    [ Border.widthEach { top = 0, left = 0, right = 0, bottom = 2 }
-                                    ]
-                                  <|
-                                    text "R"
+                                [ el [ borderBottom ] <| text "R"
                                 , el [] <| text "ecommencer"
                                 ]
                         }
